@@ -1,0 +1,271 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-touch no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="no-touch no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="no-touch no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9]> <html class="ie9 no-touch no-js"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-touch no-js"> <!--<![endif]-->
+
+<head><script src='//load.sumome.com/' data-sumo-site-id='4f98a7718170225a41affd36a49ca0322d8c50ca51ddbf573133c1a366bec6ad' data-shopify async='async'></script>
+  <meta charset="UTF-8">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <link rel="shortcut icon" type="image/png" href="{{ 'favicon.png' | asset_url }}">
+
+  {% if settings.favicon_enable %}
+  <link rel="shortcut icon" href="{{ 'favicon.png' | asset_url }}" type="image/png" />
+  {% endif %}
+
+  <title>
+    {{ page_title }}{% if current_tags %}{% assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags }}{% endif %}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  </title>
+
+  {% if page_description %}
+  <meta name="description" content="{{ page_description }}">
+  {% endif %}
+
+  <link rel="canonical" href="{{ canonical_url }}">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  {% include 'snippet-open-graph-tags' %}
+  {% include 'twitter-cards' %}
+
+  {{ 'style.scss.css' | asset_url | stylesheet_tag }}
+
+  {{ content_for_header }}
+
+  {% include 'oldIE-js' %}
+
+  {% include 'snippet-google-fonts' %}
+
+  {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' | script_tag }}
+  {{ 'modernizr.min.js' | asset_url | script_tag }}
+
+    {{ 'jquery.currencies.min.js' | asset_url | script_tag }}
+
+  {% if template contains 'customers' %}
+  {{ 'customer.css' | asset_url | stylesheet_tag }}
+  {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+  {{ 'customer_area.js'  | shopify_asset_url | script_tag }}
+  {% endif %}
+
+</head>
+
+<body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ template | split: '.' | first | remove: '/' | remove: '_' }}">
+
+  <div class="wrapper">
+
+    <header class="site-header">
+
+      <div class="cart-summary">
+        <div class="header-customer">
+          {% if shop.customer_accounts_enabled %}
+          <div class="customer-account-links">
+            {% if customer %}
+            {% capture name %}<a href="/account">{{ customer.first_name }}</a>{% endcapture %}
+            <div>{{ 'layout.customer.logged_in_as_html' | t: name: name   }}</div><div>{{ 'layout.customer.log_out' | t | customer_logout_link }}</div>
+            {% else %}
+            <div>{{ 'layout.customer.log_in' | t | customer_login_link }}</div><div>{{ 'layout.customer.create_account' | t | customer_register_link }}</div>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% include 'currency-picker' %}
+        </div>
+        <div class="brand">
+          {% if settings.use_logo %}
+          <a id="logo" href="/" role="banner">
+            {{ 'logo.png' | asset_url | img_tag: shop.name }}
+          </a>
+          {% else %}
+          <h1 id="title"><a href="/">{{ shop.name }}</a></h1>
+          {% endif %}
+
+          {% if settings.use_logo and template == 'index' %}
+          <h1 class="hidden">{{ shop.name }}</h1>
+          {% endif %}
+        </div>
+
+        <div class="header-cart">
+          <a class="no-underline" href="/cart">{{ cart.item_count}} {{ 'layout.cart.items_count' | t: count: cart.item_count }}<span id="cart-total-small">({{ cart.total_price | money }})</span></a>
+          <a href="/cart" id="cart-total">
+            {% if shop.money_format == '${{amount}}' %}
+            <span id="cart-price">{{ cart.total_price | money | replace: '.00', '' }}</span>
+            {% else %}
+            <span id="cart-price">{{ cart.total_price | money  }}</span>
+            {% endif %}
+          </a>
+          <a href="/cart" class="checkout-link">{{ 'layout.cart.checkout' | t }}</a>
+        </div>
+      </div>
+      <div class="nav-bar">
+          <nav id="navWrap" role="navigation">
+            <ul id="nav">
+              {% for link in linklists.main-menu.links %}
+              {% assign has_drop_down = false %}
+              {% assign child_list_handle = link.title | handle %}
+              {% comment %}If the link uses the arabic, hebrew or cyrillic alphabet, or is in Chinese or Japanese, the handle will be empty.{% endcomment %}
+              {% if child_list_handle == '' %}
+              {% for i in (0..8) %}
+              {% unless has_drop_down %}
+              {% if forloop.first %}
+              {% assign temp = 'link-list' %}
+              {% else %}
+              {% capture temp %}link-list-{{ i }}{% endcapture %}
+              {% endif %}
+              {% if linklists[temp] and linklists[temp].links.size > 0 and linklists[temp].title == link.title %}
+              {% assign has_drop_down = true %}
+              {% assign child_list_handle = temp %}
+              {% endif %}
+              {% endunless %}
+              {% endfor %}
+              {% else %}
+              {% if linklists[child_list_handle] and linklists[child_list_handle].links.size > 0 %}
+              {% assign has_drop_down = true %}
+              {% endif %}
+              {% endif %}
+              <li class="nav-item{% if forloop.first %} first{% elsif forloop.last %} last{% endif %}{% if link.active %} active{% endif %}{% if has_drop_down %} has-dropdown{% endif %}">
+                <a class="nav-item-link" href="{{ link.url }}">{{ link.title }}{% if has_drop_down %} <span class="icon icon-arrow-down" aria-hidden="true"></span>{% endif %}</a>
+                {% if has_drop_down %}
+                <ul class="sub-nav">
+                  {% for l in linklists[child_list_handle].links %}
+                  <li class="sub-nav-item{% if forloop.first %} first{% elsif forloop.last %} last{% endif %}">
+                    <a class="sub-nav-item-link {% if forloop.first %}first{% endif %} {% if forloop.last %}last{% endif %}" href="{{ l.url }}">{{ l.title }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </nav>
+         <form action="/search" method="get" id="search-form" role="search" class="">{% if settings.search_products_only %}
+          <input type="hidden" name="type" value="product">{% endif %}
+          {% if template == "search" and search.performed and search.terms != "" %}
+          <input type="text" name="q" id="search-field" class="hint" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}"/>
+          {% else %}
+          <input name="q" type="text" id="search-field" placeholder="{{ 'general.search.placeholder' | t }}" class="hint">
+          {% endif %}
+          <button type="submit" value="" name="submit" id="search-submit" class="icon-fallback-text">
+            <span class="icon icon-search" aria-hidden="true"></span>
+            <span class="fallback-text">{{ 'general.search.submit' | t }}</span>
+          </button>
+        </form>
+      </div>
+
+    </header>
+
+    <div id="content" role="main">
+      {{ content_for_layout }}
+    </div><!-- #content -->
+
+    {% unless settings.show_about_module == false and settings.show_contact_module == false and settings.show_mailing_list_module == false %}
+    <footer id="footer">
+      <div class="grid">
+        {% capture social_links %}{% include 'social-links' %}{% endcapture %}
+        {% if settings.show_about_module or social_links contains '<li' %}
+        <div class="grid-item col-4 medium--col-6 small--col-12 ft-module" id="about-module">
+          {% if settings.show_about_module %}
+          <h3>{{ 'layout.footer.about_module_title' | t | strip_html }}</h3>
+          <div id="about-description" class="clearfix">
+            {% if settings.about_module_text == blank %}
+            {{ 'layout.footer.about_module_text_html' | t }}
+            {% else %}
+            {{ settings.about_module_text | newline_to_br }}
+            {% endif %}
+          </div>
+          {% endif %}
+          {{ social_links }}
+        </div>
+        {% endif %}
+        {% if settings.show_contact_module %}
+        <div class="grid-item col-4 medium--col-6 small--col-12 ft-module" id="contact-module">
+          <h3>{{ 'layout.footer.contact_module_title' | t | strip_html | truncate:20 }}</h3>
+          <ul id="contact-details">
+            {% if settings.contact_module_address == blank %}
+            <li class="cd-item-1" id="cd-address">
+              {{ 'layout.footer.contact_module_text_html' | t | newline_to_br }}
+            </li>
+            {% else %}
+            <li class="cd-item-1" id="cd-address">
+              {{ settings.contact_module_address | newline_to_br }}
+            </li>
+            {% if settings.contact_module_email.size > 0 %}<li class="cd-item-1" id="cd-email"><strong>{{ 'layout.footer.contact_module_email' | t }}:</strong> <a href="mailto:{{ settings.contact_module_email }}">{{ settings.contact_module_email }}</a></li>{% endif %}
+            {% if settings.contact_module_phone.size > 0 %}<li class="cd-item-2" id="cd-phone"><strong>{{ 'layout.footer.contact_module_phone' | t }}:</strong> {{ settings.contact_module_phone }}</li>{% endif %}
+            {% if settings.contact_module_fax.size > 0 %}<li class="cd-item-3" id="cd-fax"><strong>{{ 'layout.footer.contact_module_fax' | t }}:</strong> {{ settings.contact_module_fax }}</li>{% endif %}
+            {% endif %}
+          </ul>
+        </div>
+        {% endif %}
+        {% if settings.show_mailing_list_module %}
+        <div class="grid-item col-4 small--col-12 ft-module" id="mailing-list-module">
+          <h3>{{ 'layout.footer.newsletter_title' | t | strip_html | truncate:20 }}</h3>
+          <p>{{ 'layout.footer.newsletter_tagline' | t }}</p>
+          {% if settings.mailchimp_form_action == blank %}
+            {% form 'customer' %}
+              {{ form.errors | default_errors }}
+              <span class="success"><em>{{ 'layout.footer.mailing_list_success_message' | t }}</em></span>
+              <input type="hidden" name="contact[tags]" value="prospect,newsletter">
+              <input type="email" placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}" name="contact[email]" id="email-input">
+              <input type="submit" class="btn styled-submit" value="{{ 'general.newsletter_form.submit' | t }}" name="subscribe" id="email-submit">
+            {% endform %}
+          {% else %}
+          <form action="{{ settings.mailchimp_form_action }}" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+            <input type="email" placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}" name="EMAIL" id="email-input">
+            <input type="submit" class="btn styled-submit" value="{{ 'general.newsletter_form.submit' | t }}" name="subscribe" id="email-submit">
+          </form>
+          {% endif %}
+        </div>
+        {% endif %}
+        </div>
+      </footer><!-- #footer -->
+      {% endunless %}
+
+      <div id="sub-footer">
+
+      <div class="grid">
+        <div class="grid-item col-12 large--col-3">
+          <a id="footer-logo" href="/">
+            {{ 'logo-grey.svg' | asset_url | img_tag: shop.name }}
+          </a>
+        </div>
+      
+        <div class="grid-item col-12 large--col-6">
+          {% if linklists.footer.links.size > 0 %}
+          <div class="footer-nav" role="navigation">
+            {% for link in linklists.footer.links %}
+            <a href="{{ link.url }}" title="{{ link.title }}">{{ link.title }}</a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        <div class="grid-item col-12 large--col-3">
+          <span class="footer-svg">{{ 'pp.svg' | asset_url | img_tag: "Paypal" }}</span>
+          <span class="footer-svg">{{ 'card.svg' | asset_url | img_tag: "Card" }}</span>
+        </div>
+      </div>
+
+      <div class="footer-left-content">
+
+      </div> <!-- #footer-left-content -->
+
+
+    </div><!-- #sub-footer -->
+
+  </div>
+
+  {% comment %}
+  Plugins
+  {% endcomment %}
+  {% if settings.slider_home_enable %}
+  {{ 'jquery.flexslider.min.js' | asset_url | script_tag }}
+  {% endif %}
+  {% if settings.social_sharing_blog or settings.social_sharing_products %}
+  {{ 'social-buttons.js' | asset_url | script_tag }}
+  {% endif %}
+
+  {% comment %}
+  Core shop scripts
+  {% endcomment %}
+  {{ 'plugins.js' | asset_url | script_tag }}
+  {{ 'shop.js' | asset_url | script_tag }}
+  {% include 'currencies' %}
+</body>
+</html>

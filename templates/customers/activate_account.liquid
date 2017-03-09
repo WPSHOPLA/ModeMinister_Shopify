@@ -1,0 +1,33 @@
+<div id="customer-accounts"  class="content customer">
+
+  <!-- Customer Account Activation -->
+  <div id="customer-account-activation">
+    <div class="page-header">
+      <h1>{{ 'customer.activate_account.title' | t }}</h1>
+    </div>
+
+    <p class="note accent-text text-center">{{ 'customer.activate_account.subtext' | t }}</p>
+
+    <div class="boxed-form">
+      {% form 'activate_customer_password' %}
+        {{ form.errors | default_errors }}
+
+        <div id="password" class="clearfix form-row">
+          <label class="large" for="password">{{ 'customer.activate_account.password' | t }}</label>
+          <input type="password" value="" name="customer[password]" id="customer_password" class="large styled-input" size="16">
+        </div>
+        <div id="password_confirm" class="clearfix form-row">
+          <label class="large" for="password_confirmation">{{ 'customer.activate_account.password_confirm' | t }}</label>
+          <input type="password" value="" name="customer[password_confirmation]" id="customer_password_confirmation" class="large styled-input" size="16">
+        </div>
+        <div class="action-bottom clearfix">
+          <input class="btn styled-submit" type="submit" value="{{ 'customer.activate_account.submit' | t }}">
+          <span class="note">{{ 'customer.activate_account.or' | t }}</span>
+          <input type="submit" class="cancel un-styled-btn note" name="decline" id="customer_decline" value="{{ 'customer.activate_account.cancel' | t }}">
+        </div>
+      {% endform %}
+    </div>
+
+  </div><!-- #customer-account-activation -->
+
+</div><!-- #customer-accounts -->

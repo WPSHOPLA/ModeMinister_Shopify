@@ -1,0 +1,15 @@
+<div id="current-currency" class="large--left" style="display: block;">
+  <div>{{ 'layout.customer.all_price_text' | t }} <span class="selected-currency">EUR</span></div>
+  <div id="currency-picker-toggle"><a href="#">{{ 'layout.customer.change_price_title' | t }}</a></div>
+</div>
+  <select class="currency-picker" id="currencies" name="currencies" style="display:none;">
+  {% assign codes = 'USD,EUR,GBP,CAD,ARS,AUD,BBD,BDT,BSD,BHD,BRL,BOB,BND,BGN,ILS,MMK,KYD,CLP,CNY,COP,CRC,HRK,CZK,DKK,DOP,XCD,EGP,XPF,FJD,GHS,GTQ,GYD,GEL,HKD,HUF,ISK,INR,IDR,NIS,JMD,JPY,JOD,KZT,KES,KWD,LVL,LTL,MXN,MYR,MUR,MDL,MAD,MNT,MZN,ANG,NZD,NGN,NOK,OMR,PKR,PYG,PEN,PHP,PLN,QAR,RON,RUB,SAR,RSD,SCR,SGD,SYP,ZAR,KRW,LKR,SEK,CHF,TWD,THB,TZS,TTD,TRY,UAH,AED,UYU,VEB,VND,ZMK' | split: ',' %}
+  {% assign supported_codes = settings.supported_currencies | split: ' ' %}
+  <option value="{{ shop.currency }}" selected="selected">{{ shop.currency }}</option>
+  {% for code in supported_codes %}
+    {% if code != shop.currency and codes contains code %}
+    <option value="{{ code }}">{{ code }}</option>
+    {% endif %}
+  {% endfor %}
+  </select>
+

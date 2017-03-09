@@ -1,0 +1,70 @@
+{% assign no_tags = 'no-tags' %}
+{% if template contains 'page' or template contains 'search' %}
+  {% assign blog = blogs[settings.page_blog] %}
+  {% assign title = settings.page_blog_label %}
+{% else %}
+  {% assign title = settings.blog_label %}
+  {% if blog.all_tags.size > 0 %}
+    {% assign no_tags = '' %}
+  {% endif %}
+{% endif %}
+
+<aside class="sidebar">
+
+  <h4 class="sidebar-list--title">
+    {{ 'blogs.sidebar.recently_posted' | t }}
+    {% if settings.social_rss != blank %}
+      <a class="icon-fallback-text" href="/blogs/{{ blog.handle }}.atom" title="Subscribe to the RSS feed">
+        <span class="icon icon-rss icon--small" aria-hidden="true"></span>
+        <span class="fallback-text">{{ 'blogs.sidebar.rss' | t }}</span>
+      </a>
+    {% endif %}
+  </h4>
+
+  <ul class="sidebar-list {{ no_tags }}">
+    {% for article in blogs[blog.handle].articles limit: settings.page_blog_limit %}
+    <li>
+      <p class="sidebar-article-title">
+        <a href="{{ article.url }}">
+          {{ article.title }}
+        </a>
+      </p>
+      <p class="sidebar-article-date accent-text">{{ article.published_at | date: format: 'month_day_year' }}</p>
+    </li>
+    {% endfor %}
+  </ul><!-- #snippet-blog-sideba -->
+
+  {% unless no_tags == 'no-tags' %}
+    <h4 class="sidebar-list--title">{{ 'blogs.sidebar.tags' | t }}</h4>
+    <ul id="snippet-tag-sidebar" class="sidebar-list">
+      {% for tag in blog.all_tags %}
+      <li>
+        <a class="sidebar-tag {{ tag | handle }} {% if current_tags contains tag %}current{% endif %}" href="{{ blog.url }}/tagged/{{ tag | handle }}">
+          {{ tag }}
+          <span></span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  {% endunless %}
+
+</aside>
+
+{% unless no_tags == 'no-tags' %}
+  <script type="text/javascript" charset="utf-8">
+  {% for tag in blog.all_tags %}
+    {% assign the_tag = tag %}
+    {% assign the_tag_count = 0 %}
+    var tag_count = 0
+    {% for article in blogs[blog.handle].articles %}
+      {% for tag in article.tags %}
+        {% if tag == the_tag %}
+          tag_count++;
+          {% assign the_tag_count = the_tag_count | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+    jQuery('#snippet-tag-sidebar .{{ tag | handle }}').find('span').text(tag_count);
+  {% endfor %}
+  </script>
+{% endunless %}

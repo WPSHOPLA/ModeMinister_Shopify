@@ -1,0 +1,420 @@
+/* Inputs / Submit & Global Styles */
+
+  .customer .styled-input {
+    background: #ffffff;
+    margin-bottom: 26px;
+    margin-left: 0px;
+    padding: 11px 9px;
+  }
+
+  .customer .styled-submit {
+    left: 0;
+    padding: 11px 13px;
+  }
+
+  .customer select {
+    height: 28px !important;
+    margin: 0;
+    max-width: 310px;
+  }
+
+  .customer p {
+    font-size: 14px;
+    color: {{ settings.global_text_font_color }};
+  }
+
+  .page-header h1 {
+    font-size: 35px;
+    line-height: 1;
+    text-align: center;
+    color: {{ settings.global_heading_font_color }};
+  }
+
+  .lt-ie8 .page-header {
+    margin-bottom: 40px;
+  }
+
+  .page-header a {
+    float: left;
+    font-size: 13px;
+    margin: 21px 0;
+    color: {{ settings.global_link_color }};
+  }
+
+    .page-header a:hover {
+      color: {{ settings.global_hover_color }};
+    }
+
+  .content {
+    margin-top: 58px;
+  }
+
+/* Login and register */
+
+  #recover-password {
+    display: none;
+  }
+
+  .template-customerslogin .page-header h1,
+  .template-customersresetpassword .page-header h1,
+  .template-customersregister .page-header h1 {
+    float: none;
+    text-align: center;
+  }
+
+  .template-customerslogin #recover-password .page-header h1,
+  .template-customerslogin #customer-login .page-header h1,
+  .template-customerslogin #guest .page-header h1,
+  .template-customersregister #create-customer .page-header h1 {
+    margin: 0 0 30px;
+  }
+
+  .template-customerslogin .action-bottom,
+  .template-customersresetpassword .action-bottom {
+    margin-top: 12px;
+  }
+
+  .boxed-form {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
+    max-width: 400px;
+    margin: 0 auto 40px;
+    padding: 42px 35px 38px;
+    text-align: left;
+  }
+
+  .boxed-form .row + .row {
+    padding-top: 10px;
+  }
+
+  .boxed-form .errors {
+    background-color: #fcedec;
+    border: 1px solid #fb8077;
+    border-radius: 2px;
+    margin: 0 auto 30px;
+    padding: 10px;
+  }
+
+  .boxed-form .errors ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .boxed-form label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .boxed-form .styled-input,
+  .boxed-form select {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+    #recover-password-wrap .styled-input {
+      margin-bottom: 18px;
+    }
+
+    .action-bottom .styled-submit {
+      float: left;
+    }
+
+    #forgot_password {
+      float: right;
+    }
+
+      #forgot_password a, #recover-password span.note a, #customer-login .note a {
+        color: {{ settings.global_link_color }};
+    }
+
+        #forgot_password a:hover, #recover-password span.note a:hover, #customer-login .note a:hover {
+          color: {{ settings.global_hover_color }};
+      }
+
+  #recover-password span.note {
+    display: block;
+    float: left;
+    font-size: 14px;
+    margin-left: 11px;
+    margin-top: 11px;
+  }
+
+  #guest {
+    margin: 0 0 112px;
+    text-align: center;
+  }
+
+    #guest .page-header h1 {
+      margin-bottom: 24px;
+    }
+
+    #guest .styled-submit {
+      display: inline-block;
+      margin-top: 18px;
+    }
+
+
+/* Account */
+
+  .change-password-form {
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid {{ settings.primary_border }};
+  }
+
+      .address {
+        margin: 20px 0 28px;
+      }
+
+      .address p {
+        margin: 0;
+      }
+
+      #view_address {
+        display: block;
+        color: {{ settings.global_link_color }};
+      }
+
+        #view_address:hover {
+          color: {{ settings.global_hover_color }};
+        }
+
+      #customer_orders a:hover {
+        color: {{ settings.global_hover_color }};
+      }
+
+      #customer_orders th {
+        color: {{ settings.global_heading_font_color }};
+        font-size: 14px;
+        font-weight: 700;
+        text-align: left;
+      }
+
+      #customer_orders tr {
+        border-bottom: 1px solid {{ settings.primary_border }};
+      }
+
+      #customer_orders tr.last {
+        border-bottom: none;
+      }
+
+        #customer_orders td {
+          font-size: 14px;
+          padding: 23px 0;
+        }
+
+          .fulfillment_color {
+            color: {{ settings.global_small_link_color }};
+        }
+
+      #customer_orders .order_number {
+        padding-right: 40px;
+      }
+
+      #customer_orders .date {
+        padding-right: 40px;
+      }
+      #customer_orders .payment_status {
+        padding:0 20px;
+        text-align:right;
+      }
+      #customer_orders .fulfillment_status {
+        padding:0 20px;
+        text-align:right;
+      }
+      #customer_orders .total {
+        text-align:right;
+      }
+
+
+/* Address */
+
+  .address_title {
+    color: {{ settings.global_heading_font_color }};
+    font-size: 16px;
+    margin-top: 0;
+  }
+
+  .default_address.note {
+    color: {{ settings.global_small_link_color }};
+    font-size: 13px;
+  }
+
+  .address_actions a {
+    color: {{ settings.global_font_color }};
+  }
+
+    .address_actions a:hover {
+      color: {{ settings.global_hover_color }};
+    }
+
+  .address_actions {
+    margin-bottom: 24px;
+  }
+
+  .view_address p {
+    color: {{ settings.global_text_font_color }};
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .address_table {
+    border-top: 1px solid {{ settings.primary_border }};
+    padding: 24px 0 0;
+}
+
+  .address_table.first {
+    border-top: none;
+    padding: 0;
+  }
+
+  /* Add & Edit New Address */
+  #address_province_new {
+    width: 100%;
+  }
+
+  .set_default {
+    margin-bottom: 20px;
+  }
+
+  .set_default label {
+    color: {{ settings.global_small_link_color }};
+    font-size: 13px;
+}
+
+  .action-bottom .note {
+    display: block;
+    float: left;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-left: 8px;
+    margin-top: 11px;
+  }
+
+    .action-bottom .note a {
+      color: {{ settings.global_link_color }};
+  }
+    .action-bottom .note a:hover {
+      color: {{ settings.global_hover_color }};
+  }
+
+/* Orders */
+
+.template-customersorder .content {
+  margin-bottom: 60px;
+}
+
+  #order_details_label {
+    color: {{ settings.global_heading_font_color }};
+    font-size: 20px;
+}
+
+    .order_section_title {
+      color: {{ settings.global_text_font_color }};
+      font-size: 14px;
+  }
+
+    .address.note {
+      margin: 0 0 22px 0;
+    }
+
+    .address.note p {
+      color: {{ settings.global_text_font_color }};
+      font-size: 14px;
+      line-height: 21px;
+  }
+
+  #order_details th {
+    color: {{ settings.global_heading_font_color }};
+    font-size: 16px;
+    font-weight: 700;
+}
+
+  #order_details th.first {
+    text-align: left;
+  }
+
+  #order_details th.last {
+    text-align: right;
+  }
+
+  #order_details th.center {
+    text-align: center;
+  }
+
+  #order_details tr {
+    border-bottom: 1px solid {{ settings.primary_border }};
+}
+
+  #order_details tr.last {
+    border-bottom: none;
+  }
+
+    #order_details td {
+      font-size: 14px;
+      line-height: 21px;
+      padding: 21px 0;
+    }
+
+    #order_details p {
+      margin: 0.5em 0 0;
+    }
+
+    #order_details td.first {
+      padding-bottom: 21px;
+      padding-top: 21px;
+    }
+
+      #order_details a {
+        color: {{ settings.global_link_color }};
+    }
+      #order_details a:hover {
+        color: {{ settings.global_hover_color }};
+    }
+
+    #order_details .product {
+    }
+    #order_details .money {
+      white-space: nowrap;
+    }
+    #order_details .quantity {
+      text-align: right;
+      padding: 0 20px;
+    }
+    #order_details .price{
+      padding: 0 20px;
+      text-align: right;
+    }
+    #order_details .total {
+      text-align: right;
+      padding-right: 0px;
+    }
+
+    #order_details .order_summary {
+      border-bottom: none !important;
+    }
+
+      #order_details .order_summary td {
+        padding: 0px 0px 24px;
+      }
+
+      #order_details .order_summary td {
+        padding: 24px 0px 24px;
+      }
+
+      #order_details .order_summary.last td {
+        padding-top: 24px;
+      }
+
+    #order_details .order_summary.order_total {
+      border-top: 1px solid {{ settings.primary_border }};
+  }

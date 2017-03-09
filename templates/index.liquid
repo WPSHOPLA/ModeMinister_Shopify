@@ -1,0 +1,263 @@
+{% include 'cta' %}
+
+{% if settings.show_featured_products %}
+
+  {% comment %}
+    If no collection has been specified, we'll find one that contains products.
+  {% endcomment %}
+  {% if settings.featured_products_collection == blank or collections[settings.featured_products_collection].handle != settings.featured_products_collection %}
+    {% for c in collections %}
+      {% if c.products_count > 0 %}
+        {% assign collection = c %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    {% assign collection = collections[settings.featured_products_collection] %}
+  {% endif %}
+
+  <div id="featured-products">
+    <h3 class="text-center">Notre Sélection</h3>
+
+    <div class="grid-uniform">
+      {% case settings.featured_products_limit %}
+        {% when '3' %}
+          {% assign grid_item_width = 'large--col-4 medium-down--col-4' %}
+        {% else %}
+          {% assign grid_item_width = 'large--col-3 medium-down--col-6' %}
+      {% endcase %}
+
+      {% for product in collection.products limit: settings.featured_products_limit %}
+        {% include 'snippet-product-item' %}
+      {% endfor %}
+    </div>
+  </div>
+<hr>
+{% endif %}
+
+{% if settings.show_blog or settings.show_browse or settings.show_link_list_1 or settings.show_link_list_2 or settings.show_product_list or settings.show_collection_list or settings.show_welcome_text %}
+
+<div class="grid">
+  {% assign full_width = false %}
+
+  {% if settings.show_blog or settings.show_browse or settings.show_link_list_1 or settings.show_link_list_2 %}
+    <div class="grid-item col-5 medium-down--col-12">
+      {% if settings.show_blog %}
+        <div class="widget">
+          <h4 class="widget-title">
+            {{ 'home_page.sections.news_title' | t }}
+            {% if settings.social_rss != blank %}
+              <a class="icon-fallback-text" href="{{ blogs[settings.fp_blog].url }}.atom" title="Subscribe to the RSS feed">
+                <span class="icon icon-rss icon--small" aria-hidden="true"></span>
+                <span class="fallback-text">RSS</span>
+              </a>
+            {% endif %}
+          </h4>
+
+          {% for article in blogs[settings.fp_blog].articles limit: settings.fp_blog_limit %}
+            <div id="{{ article.id }}" class="fp-article {% if forloop.first %}first{% endif %} {% if forloop.last %}last{% endif %}">
+              <em class="fp-article-date accent-text">{{ article.published_at | date: format: "month_day_year" }}</em>
+              <h3 class="fp-article-title"><a href="{{article.url}}">{{ article.title }}</a></h3>
+              <div class="fp-article-content rte">
+                {% if article.image %}
+                  {% assign image_alt = article.title | escape %}
+                  <p>{{ article | img_url: 'large' | img_tag: image_alt, 'fp-article-image' | link_to: article.url }}</p>
+                {% endif %}
+                {% if article.excerpt.size > 0 %}
+                  {{ article.excerpt }}
+                {% else %}
+                  <p>{{ article.content | strip_html | truncatewords: 50 }}</p>
+                {% endif %}
+              </div><!-- .fp-article-content -->
+              <a class="fp-read-more accent-text" href="{{ article.url }}">{{ 'home_page.sections.read_more_label' | t }} →</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+     {% include 'recently-viewed' %}
+
+      {% if settings.show_browse %}
+        <div class="widget {% if settings.show_blog == false %}first{% endif %}" id="fp-browse">
+          <h4 class="widget-title">{{ 'home_page.sections.browse_title' | t }}</h4>
+
+          {% if settings.show_bb_vendor and settings.show_vendor %}
+            {% assign first_letter = settings.word_for_vendor | truncate: 1, '' %}
+            <div class="browse-by">
+              <p>{{ 'home_page.sections.browse_by_vendor_title' | t }}</p>
+              <select name="fp_bb_vendor" id="fp_bb_vendor" size="1">
+                <option value="">{{ 'home_page.sections.choose_vendor' | t }}</option>
+                {% for product_vendor in shop.vendors %}
+                  {% assign product_vendor_handle = product_vendor | handle %}
+                  {% if collections[product_vendor_handle].handle == product_vendor_handle %}
+                  <option value="/collections/{{ product_vendor_handle }}">{{ product_vendor }}</option>
+                  {% else %}
+                  <option value="{{ product_vendor | url_for_vendor }}">{{ product_vendor }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+
+          {% if settings.show_bb_category %}
+            <div class="browse-by">
+              <p>{{ 'home_page.sections.browse_category_title' | t }}</p>
+              <select name="fp_bb_category" id="fp_bb_category" size="1">
+                <option value="">{{ 'home_page.sections.choose_category' | t }}</option>
+                {% for collection in collections %}
+                {% unless collection.handle == 'all' or collection.handle == 'all-products' or collection.handle == 'frontpage' %}
+                <option value="{{ collection.url }}">{{ collection.title }}</option>
+                {% endunless %}
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if settings.show_link_list_1 %}
+        <div class="widget {% if settings.show_blog == false and settings.show_browse == false %}first{% endif %}" id="fp-link-list-1">
+          <h4 class="widget-title">{{ linklists[settings.fp_link_list_1].title }}</h4>
+          <ul id="link-list-1" class="link-list">
+            {% for link in linklists[settings.fp_link_list_1].links %}
+              <li class="ll-item"><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if settings.show_link_list_2 %}
+        <div class="widget {% if settings.show_blog == false and settings.show_browse == false and settings.show_link_list_1 == false %}first{% endif %}" id="fp-link-list-2">
+          <h4 class="widget-title">{{ linklists[settings.fp_link_list_2].title }}</h4>
+          <ul id="link-list-2" class="link-list">
+            {% for link in linklists[settings.fp_link_list_2].links %}
+            <li class="ll-item"><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    {% assign full_width = true %}
+  {% endif %}
+
+  {% if settings.show_product_list or settings.show_collection_list or settings.show_welcome_text %}
+    <div class="grid-item {% if full_width %}col-12{% else %}col-7{% endif %} medium-down--col-12">
+      {% if settings.show_product_list == false and shop.products_count == 0 %}
+        {% include 'snippet-default-products' %}
+      {% endif %}
+
+      {% if settings.show_product_list or settings.show_collection_list or settings.show_welcome_text %}
+        {% if settings.show_product_list and settings.product_list_collection != '' and collections[settings.product_list_collection].handle == settings.product_list_collection %}
+          <div class="index-featured-grid">
+            <div class="clearfix">
+              <h3 class=" widget-title text-center">{{ collections[settings.product_list_collection].title }}</h3>
+            </div>
+            {% if shop.products_count == 0 %}
+              {% include 'snippet-default-products' %}
+            {% else %}
+              {% if collections[settings.product_list_collection].products_count == 0 %}
+                <div class="rte">
+                  <p>{{ 'home_page.onboarding.no_collections_html' | t }}</p>
+                </div><!-- .rte -->
+              {% else %}
+                {% assign productCount = 0 %}
+                <ul class="grid-uniform{% if shop.products_count == 0 %} default{% endif %}" id="fp-product-list">
+                  {% assign collection = collections[settings.product_list_collection] %}
+                  {% for product in collection.products limit: settings.product_list_limit %}
+                    {% if full_width %}
+                      {% assign grid_item_width = 'large--col-3 medium-down--col-6' %}
+                    {% else %}
+                      {% assign grid_item_width = 'large--col-6 medium-down--col-6' %}
+                    {% endif %}
+                    {% include 'snippet-product-item' %}
+                    {% assign productCount = productCount | plus: 1 %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if settings.show_collection_list and shop.products_count > 0 and shop.collections_count > 0 %}
+          <div class="index-featured-grid">
+            <div class="clearfix">
+              <h3 class="large--left widget-title">{{ linklists[settings.collection_list_ll].title }}</h3>
+              <a class="large--right accent-text" href="{{ shop.url }}/collections">{{ 'home_page.sections.view_all_collections' | t }} →</a>
+            </div>
+            {% if settings.collection_list_ll and settings.collection_list_ll != 'main-menu' and linklists[settings.collection_list_ll].links.size > 0 %}
+              {% assign collectionCount = 0 %}
+              <div class="grid-uniform" id="browse-by-category">
+                {% for link in linklists[settings.collection_list_ll].links %}
+                  {% if link.type == 'collection_link' %}
+                    {% assign collection = link.object %}
+                    {% if full_width %}
+                      {% assign grid_item_width = 'large--col-3 medium-down--col-6' %}
+                    {% else %}
+                      {% assign grid_item_width = 'large--col-6 medium-down--col-6' %}
+                    {% endif %}
+                    {% include 'snippet-collection-item' %}
+                    {% assign collectionCount = collectionCount | plus: 1 %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              {% capture link_list_title %}<strong>{{ linklists[settings.collection_list_ll].title }}</strong>{% endcapture %}
+
+              {% if collectionCount == 0 %}
+                <div class="rte">
+                  {{ 'home_page.onboarding.no_linklist_html' | t: link_list_title: link_list_title }}
+                </div>
+              {% endif %}
+
+            {% else %}
+              {% assign collectionCount = 0 %}
+              <div class="grid-uniform" id="browse-by-category">
+                {% for collection in collections %}
+                  {% unless collection.products_count == 0 or collection.handle == 'frontpage' or collection.handle == 'all' %}
+                  {% if full_width %}
+                    {% assign grid_item_width = 'large--col-3 medium-down--col-6' %}
+                  {% else %}
+                    {% assign grid_item_width = 'large--col-6 medium-down--col-6' %}
+                  {% endif %}
+                  {% include 'snippet-collection-item' with 'four' %}
+                  {% assign collectionCount = collectionCount | plus: 1 %}
+                  {% endunless %}
+                {% endfor %}
+              </div>
+
+              {% if collectionCount == 0 %}
+                <div class="rte">
+                  {{ 'home_page.onboarding.no_other_collections_html' | t }}
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if settings.show_welcome_text %}
+          <div id="welcome-text">
+            <h4 class="widget-title" id="fp-welcome-title">{{ pages[settings.welcome_text_page].title }}</h4>
+            <div class="rte">
+              {{ pages[settings.welcome_text_page].content }}
+            </div>
+          </div><!-- #welcome-text -->
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+
+<hr>
+
+<script>
+/* Module: Browse */
+
+jQuery('#fp_bb_category, #fp_bb_vendor').change(function(){
+  if (jQuery(this).val().length > 0) {
+    window.location = jQuery(this).val();
+  }
+});
+</script>
+
+{% endif %}

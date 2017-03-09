@@ -1,0 +1,21 @@
+{% if paginate.previous or paginate.next %}
+<div class="pagination {% if template contains 'collection' %}wide{% endif %}">
+  
+  <a {% if paginate.previous %}href="{{ paginate.previous.url }}"{% endif %} class="{% if paginate.previous %}active{% endif %}">← {{ 'general.pagination.previous' | t }}</a>
+  
+  {% for part in paginate.parts %}
+    {% if part.is_link %}
+      <a href="{{ part.url }}" class="active">{{ part.title }}</a>
+    {% else %}
+      {% if part.title == '&hellip;' %}
+        <em class="pagination-ellipsis">{{ part.title }}</em>
+      {% else %}
+        <span class="current">{{ part.title }}</span>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  
+  <a {% if paginate.next %}href="{{ paginate.next.url }}"{% endif %} class="{% if paginate.next %}active{% endif %}">{{ 'general.pagination.next' | t }} →</a>
+  
+</div>
+{% endif %}

@@ -1,0 +1,67 @@
+<div class="page-container">
+
+  <h1>{{ page.title }}</h1>
+
+  <div class="grid">
+    <div id="page-content" class="grid-item{% if settings.show_page_blog %} col-8 small--col-12{% endif %}">
+      <div class="rte">
+        {{ page.content }}
+      </div>
+      {% form 'contact' %}
+
+        {% if form.posted_successfully? %}
+          <div class="success feedback accent-text">
+            <p>{{ 'contact.form.post_success' | t }}</p>
+          </div>
+        {% endif %}
+
+        {% if form.errors %}
+          <div class="error feedback accent-text">
+            <p>{{ 'general.forms.post_error' | t: form: form.errors }}</p>
+            {% for field in form.errors %}
+            {{ 'general.forms.post_field_error_html' | t: field: field_name, error: form.errors.messages[field] }}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% unless form.posted_successfully? %}
+          <p>
+            <label>{{ 'contact.form.name' | t }}</label>
+            <input type="text" id="contactFormName" name="contact[name]" placeholder="{{ 'contact.form.name' | t }}" class="styled-input{% if form.errors contains 'name' %} error{% endif %}" value="{{ contact.fields.name }}">
+          </p>
+          <p>
+            <label>{{ 'contact.form.email' | t }}</label>
+            <input required="required" type="email" id="contactFormEmail" name="contact[email]" placeholder="{{ 'contact.form.email' | t }}" class="styled-input{% if form.errors contains 'email' %} error{% endif %}" value="{{ contact.fields.email }}">
+          </p>
+          <p>
+            <label>{{ 'contact.form.phone' | t }}</label>
+            <input type="tel" id="contactFormTelephone" name="contact[phone]" placeholder="555-555-1234" class="styled-input{% if form.errors contains 'phone' %} error{% endif %}" value="{{ contact.fields.phone }}">
+          </p>
+          <p>
+            <label>{{ 'contact.form.message' | t }}</label>
+            <textarea required="required" rows="10" cols="60"  id="contactFormMessage" name="contact[body]" placeholder="{{ 'contact.form.message' | t }}" class="styled-input{% if form.errors contains 'body' %} error{% endif %}">{{  contact.fields.body }}</textarea>
+          </p>
+          <p>
+            <input class="btn styled-submit" type="submit" id="contactFormSubmit" value="{{ 'contact.form.send' | t }}">
+          </p>
+        {% endunless %}
+
+        {% if form.posted_successfully? or form.errors %}
+          <script>
+            window.location.hash = '#page-content';
+          </script>
+        {% endif %}
+      {% endform %}
+    </div><!-- #page-content -->
+
+    {% if settings.show_page_blog %}
+      <div class="grid-item col-4 small--col-12">
+        {% include 'snippet-sidebar' %}
+      </div>
+    {% endif %}
+
+  </div>
+
+</div><!-- #page-container -->
+{% include 'snippet-breadcrumbs' %}
+

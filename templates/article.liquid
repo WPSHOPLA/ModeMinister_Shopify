@@ -1,0 +1,179 @@
+{% paginate article.comments by settings.article_cpp %}
+
+{% assign number_of_comments = article.comments_count %}
+
+{% comment %}If a comment was just submitted, and it has no blank fields.{% endcomment %}
+{% if comment and comment.created_at %}
+  {% assign number_of_comments = article.comments_count | plus: 1 %}
+{% endif %}
+
+<div class="clearfix page-container">
+
+  <div class="grid">
+    <div id="blog-content" class="grid-item{% if settings.show_page_blog %} col-8 small--col-12{% endif %}">
+      <div class="blog-article {% unless blog.comments_enabled? %}no-comment{% endunless %}">
+
+        <article>
+          <header>
+            <h1>
+              <a href="{{ shop.url }}{{ article.url }}">{{ article.title }}</a>
+            </h1>
+            {% capture author %}<strong>{{ article.author }}</strong>{% endcapture %}
+            {% assign published_at = article.published_at | date: format: 'month_day_year' %}
+            <p class="blog-article-date accent-text"><time pubdate datetime="{{ published_at }}">{{ 'blogs.article.author_on_date_html' | t: author: author, date: published_at }}</time></p>
+          </header>
+
+          <div class="rte entry-content">
+            {{ article.content }}
+          </div>
+        </article>
+
+        <div class="blog-article-meta accent-text">
+          {% if article.tags.size > 0 %}
+            <div class="blog-article-meta-item">
+              <span class="icon-fallback-text">
+                <span class="icon icon-tag" aria-hidden="true"></span>
+                <span class="fallback-text">{{ 'blogs.article.tags' | t }}</span>
+              </span>
+              {% for tag in article.tags %}
+                <a class="blog-article-tags" href="{{ blog.url }}/tagged/{{ tag | handle }}">{{ tag }}{% unless forloop.last %}, {% endunless %}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        {% if settings.social_sharing_blog %}
+          {% include 'social-sharing' %}
+        {% endif %}
+      </div>
+
+      <hr>
+
+      {% if blog.next_article or blog.previous_article %}
+        <div class="accent-text prev-next">
+          {% if blog.next_article %}
+            {% capture next_url %}{{ blog.next_article }}#content{% endcapture %}
+            {{ 'blogs.article.newer_post' | t | prepend: '← ' | link_to: next_url }}
+          {% endif %}
+          {% if blog.previous_article %}
+            {% capture prev_url %}{{ blog.previous_article }}#content{% endcapture %}
+            {{ 'blogs.article.older_post' | t | append: ' →' | link_to: prev_url }}
+          {% endif %}
+        </div>
+        <hr>
+      {% endif %}
+
+      {% if blog.comments_enabled? %}
+
+        <div class="blog-comments" id="comments">
+
+          {% if number_of_comments > 0 %}
+          <h3>{{ 'blogs.comments.comments_on_post_title' | t }} <em>({{ 'blogs.comments.with_count' | t: count: number_of_comments }})</em></h3>
+          <ul id="comment-list">
+            {% if comment and comment.created_at %}
+            <li>
+              <div class="success feedback accent-text">
+                  {% if blog.moderated? %}
+                  <p>{{ 'blogs.comments.success_moderated' | t }}</p>
+                  {% else %}
+                  <p>{{ 'blogs.comments.success' | t }}</p>
+                  {% endif %}
+              </div>
+            </li>
+            <li id="{{ comment.id }}" class="comment clearfix">
+              <p class="comment-author accent-text">{{ 'blogs.comments.author_says' | t: author: comment.author }}</p>
+              <img class="comment-author-picture" src="https://www.gravatar.com/avatar/{{ comment.email | remove: ' ' | strip_newlines | downcase | md5 }}?s=80">
+              <div class="comment-content">
+                <em class="quote-glyph">&ldquo;</em>
+                <div>
+                  {{ comment.content }}
+                </div>
+              </div><!-- .comment-content -->
+              <p class="comment-date accent-text">
+                {{ comment.created_at | date: format: "month_day_year" }}
+              </p>
+            </li>
+            {% endif %}
+
+            {% for comment in article.comments %}
+            <li id="{{ comment.id }}" class="comment clearfix">
+              <p class="comment-author accent-text">{{ 'blogs.comments.author_says' | t: author: comment.author }}</p>
+              <img class="comment-author-picture" src="https://www.gravatar.com/avatar/{{ comment.email | remove: ' ' | strip_newlines | downcase | md5 }}?s=80">
+              <div class="comment-content">
+                <em class="quote-glyph">&ldquo;</em>
+                <div>
+                  {{ comment.content }}
+                </div>
+              </div><!-- .comment-content -->
+              <p class="comment-date accent-text">
+                {{ comment.created_at | date: format: "month_day_year" }}
+              </p>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          {% comment %}
+          <h1 id="comments-title" class="no-comments">{{ 'blogs.article.no_comments' | t }}</h1>
+          {% endcomment %}
+          {% endif %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+          <li>
+            {% include 'snippet-pagination' %}
+          </li>
+        {% endif %}
+
+        {% form "new_comment", article %}
+
+          <div class="blog-add-comments">
+            <h3 id="add-comment-title">{{ 'blogs.comments.title' | t }}</h3>
+
+            {% if form.errors %}
+              <div class="feedback error" id="comment-errors">
+                <p>{{ settings.comments_error_message }}</p>
+                {% for field in form.errors %}
+                <p>The {{ field | capitalize | replace: 'Body', 'Message' }} field {{ form.errors.messages[field] }}.</p>
+                {% endfor %}
+              </div><!-- #comment-errors -->
+            {% endif %}
+
+            <p>
+              <label for="add-comment-name">{{ 'blogs.comments.name' | t }}</label>
+              <input required="required" class="styled-input {% if form.errors contains "author" %}error{% endif %}" type="text" name="comment[author]" placeholder="{{ 'blogs.comments.name' | t }}" id="add-comment-name" value="{{ form.author }}">
+            </p>
+
+            <p>
+              <label for="add-comment-email">{{ 'blogs.comments.email' | t }}</label>
+              <input required="required" class="styled-input {% if form.errors contains "email" %}error{% endif %}" type="email" name="comment[email]" placeholder="{{ 'blogs.comments.email' | t }}" id="add-comment-email" value="{{ form.email }}">
+            </p>
+
+            <p>
+              <label for="add-comment-body">{{ 'blogs.comments.message' | t }}</label>
+              <textarea required="required" class="styled-input {% if form.errors contains "body" %}error{% endif %}" id="add-comment-body" name="comment[body]" rows="10" cols="60">{{ form.body }}</textarea>
+            </p>
+            {% if blog.moderated? %}
+              <p>{{ 'blogs.comments.moderated' | t }}</p>
+            {% endif %}
+
+            <input type="submit" class="styled-submit" id="add-comment-submit" value="{{ 'blogs.comments.post' | t }}">
+
+          </div>
+
+        {% endform %}
+
+      {% endif %}<!-- end comments -->
+    </div>
+
+    {% if settings.show_page_blog %}
+      <div class="grid-item col-4 small--col-12">
+        {% include 'snippet-sidebar' %}
+      </div>
+    {% endif %}
+  </div>
+
+</div><!-- #blog-container -->
+
+{% endpaginate %}
+
+{% include 'snippet-breadcrumbs' %}

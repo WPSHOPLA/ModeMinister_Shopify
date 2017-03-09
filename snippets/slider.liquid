@@ -1,0 +1,23 @@
+{% if settings.slider_home_enable %}
+  <div class="flexslider" id="heroSlider">
+    <ul class="slides">
+      {% for i in (1..6) %}
+        {% capture slide %}slide_{{ i }}{% endcapture %}
+        {% capture slide_link %}slide_{{ i }}_link{% endcapture %}
+        {% capture slide_img %}slide_{{ i }}.jpg{% endcapture %}
+        {% capture slide_img_alt %}slide_{{ i }}_alt{% endcapture %}
+        {% capture slide_img_caption %}slide_{{ i }}_caption{% endcapture %}
+        {% if settings[slide] %}
+          <li>
+            <a href="{{ settings[slide_link] }}" class="slide-link">
+              <img src="{{ slide_img | asset_img_url: '1024x1024' }}" alt="{{ settings[slide_img_alt] }}">
+              {% unless settings[slide_img_caption] == blank %}
+              <p class="h3 flex-caption small--hide">{{ settings[slide_img_caption] }}</p>
+              {% endunless %}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

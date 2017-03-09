@@ -1,0 +1,14 @@
+{% capture cta_link %}cta_1_link{% endcapture %}
+{% capture cta_img %}cta_1.jpg{% endcapture %}
+{% capture cta_img_alt %}cta_1_alt{% endcapture %}
+{% capture cta_main %}cta_1_main{% endcapture %}
+{% capture cta_baseline %}cta_1_baseline{% endcapture %}
+{% capture cta_button %}cta_1_button{% endcapture %}
+<a href="{{ settings[cta_link] }}" class="cta-wrapper">
+  <img src="{{ cta_img | asset_img_url: '1024x1024' }}" alt="{{ settings[slide_img_alt] }}">
+  <div class="cta-block">
+    <div class="cta-title">{{ settings[cta_main] }}</div>
+    <div class="cta-baseline">{{ settings[cta_baseline] }}</div>
+    <div class="cta-button"><span>{{ settings[cta_button] }}</span></div>
+  </div>
+</a>

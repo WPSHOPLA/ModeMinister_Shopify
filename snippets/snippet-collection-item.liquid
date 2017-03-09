@@ -1,0 +1,23 @@
+{% unless grid_item_width %}
+  {% assign grid_item_width = 'large--col-4 medium-down--col-6' %}
+{% endunless %}
+
+<div class="grid-item {{ grid_item_width }}">
+  <div class="coll">
+    <div class="coll-image-wrap">
+      <a href="{{ collection.url }}">
+      {% if collection.image %}
+          {{ collection.image.src | img_url: 'large' | img_tag: collection.image.alt }}
+        {% else %}
+          {{ collection.products.first.featured_image.src | img_url: 'large' | img_tag: collection.title }}
+      {% endif %}
+      </a>
+    </div><!-- .coll-image-wrap -->
+    <div class="coll-prod-caption">
+      <div class="coll-prod-meta no-medallion">
+        <h4><a href="{{ collection.url }}">{{ collection.title }}</a></h4>
+        <p class="collection-list-product-count accent-text">{{ 'collections.general.products_with_count' | t: count: collection.all_products_count }}</p>
+      </div><!-- .coll-prod-meta -->
+    </div><!-- .prod-prod-meta -->
+  </div>
+</div>

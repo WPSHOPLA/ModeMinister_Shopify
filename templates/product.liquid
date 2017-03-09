@@ -1,0 +1,303 @@
+<div class="clearfix" id="product-content" itemscope itemtype="http://schema.org/Product">
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+  <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+
+  {% comment %}The reason why we're removing the form tags when the product is sold out is because we add a 'notify me when product is available' contact form within, and nested forms don't work.{% endcomment %}
+  {% if product.available %}
+    <form action="/cart/add" method="post" enctype="multipart/form-data">
+  {% endif %}
+
+    <div class="grid">
+
+      <div id="product-photos" class="grid-item col-6 small--col-12">
+        {% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+
+        {% if product.images.size == 0 %}
+          <div id="product-photo-container">
+            <img src="{{ '' | img_url: 'grande' }}" alt="">
+          </div><!-- #product-photo-container -->
+        {% else %}
+          <div id="product-photo-container">
+            {% if product.images.size == 1 %}
+              <a href="{{ featured_image | img_url: '1024x1024' }}" rel="gallery">
+                <img src="{{ product.featured_image.src | img_url: 'grande' }}" alt="{{ featured_image.alt | escape }}" data-image-id="{{ featured_image.id }}" id="productPhotoImg">
+              </a>
+            {% else %}
+              <img src="{{ featured_image | img_url: 'grande' }}" alt="{{ featured_image.alt | escape }}" data-image-id="{{ featured_image.id }}" id="productPhotoImg">
+            {% endif %}
+          </div>
+
+          {% if product.images.size > 1 %}
+            <ul id="product-photo-thumbs" class="clearfix">
+              {% for image in product.images %}
+                <li class="product-photo-thumb">
+                  <a class="gallery" href="{{ image.src | img_url: 'original' }}" data-image-id="{{ image.id }}">
+                    <img src="{{ image.src | img_url: 'compact' }}" alt="{{ image.alt | escape }}">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+            <ul id="lightbox" class="hidden">
+              {% for image in product.images %}
+                <li>
+                  <a href="{{ image.src | img_url: '1024x1024' }}" rel="gallery" data-image-id="{{ image.id }}"></a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endif %}
+      </div><!-- #product-photos -->
+      <div class="grid-item col-6 product-col small--col-12">
+
+        <h1 itemprop="name">{{ product.title }}</h1>
+        {% if settings.show_vendor %}
+          {% assign product_vendor_handle = product.vendor | handle %}
+          {% if collections[product_vendor_handle].handle == product_vendor_handle %}
+            {% assign vendor_url = collections[product_vendor_handle].url %}
+          {% else %}
+            {% assign vendor_url = product.vendor | url_for_vendor %}
+          {% endif %}
+          <h3 itemprop="brand">{{ product.vendor | link_to: vendor_url }}</h3>
+        {% endif %}
+
+
+        {% if settings.prod_desc_placement == 'above' %}
+          {% unless product.description == blank %}
+          <div id="product-description" class="above">
+            <div id="full_description" class="rte" itemprop="description">
+              {{ product.description }}
+            </div>
+          </div>
+
+          {% endunless %}
+        {% endif %}
+
+
+
+        {% assign hide_default_title = false %}
+        {% if product.variants.size == 1 and product.variants.first.title contains 'Default' %}
+          {% assign hide_default_title = true %}
+        {% endif %}
+
+        <div class="{% if hide_default_title %}{% unless settings.show_qty and product.available %} hidden{% endunless %}{% endif %}">
+          <div class="select-wrappers{% if hide_default_title %} hidden{% endif %}">
+            <select id="product-select" name="id" class="hidden">
+              {% for variant in product.variants %}
+              <option{% if variant == product.selected_or_first_available_variant %} selected{% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% if settings.show_qty %}
+            <div class="selector-wrapper">
+              <input id="quantity" type="number" name="quantity" class="styled-input" value="1" min="1">
+            </div>
+          {% endif %}
+        </div>
+
+
+        <div id="product-prices" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+          {% if product.available %}
+            <link itemprop="availability" href="http://schema.org/InStock">
+          {% else %}
+            <link itemprop="availability" href="http://schema.org/OutOfStock">
+          {% endif %}
+          <p id="product-price">
+            {% if product.compare_at_price > product.price %}
+              <span class="product-compare-price">{{ product.compare_at_price_max | money }}</span><span class="product-price on-sale" itemprop="price" content="{{ product.price | divided_by: 100.00 }}">{{ product.price | money }}</span>
+            {% else %}
+              <span class="product-price" itemprop="price" content="{{ product.price | divided_by: 100.00 }}">{{ product.price | money }}</span>
+            {% endif %}
+          </p>
+        </div>
+        {% comment %}
+        Additional form fields to customize your product.
+        Example code below for every type of form fields.
+        Use any form field, and as many as you need.
+        {% endcomment %}
+
+        {% comment %}
+        <div id="properties">
+          <div class="property-wrapper">
+            <label for="first-property">First Property</label>
+            <select id="first-property" name="properties[First Property]">
+              <option>First Option</option>
+              <option>Second Option</option>
+              <option>Third Option</option>
+              <option>Fourth Option</option>
+            </select>
+          </div>
+          <div class="property-wrapper">
+            <p>Second Property</p>
+            <input class="radio" type="radio" id="first-option" name="properties[Second Property]" value="First Option"> <label for="first-option">First Option</label>
+            <input class="radio"type="radio" id="second-option" name="properties[Second Property]" value="Second Option"> <label for="second-option">Second Option</label>
+            <input class="radio"type="radio" id="third-option" name="properties[Second Property]" value="Third Option"> <label for="third-option">Third Option</label>
+            <input class="radio"type="radio" id="fourth-option" name="properties[Second Property]" value="Fourth Option"> <label for="fourth-option">Fourth Option</label>
+          </div>
+          <div class="property-wrapper">
+            <label for="third-property">Third Property</label>
+            <input class="text" type="text" id="third-property" name="properties[Third Property]" value="">
+          </div>
+          <div class="property-wrapper">
+            <input class="checkbox" type="checkbox" id="fourth-property" name="properties[Fourth Property]" value="Yes">
+            <label for="fourth-property">Fourth Property Opt-in</label>
+          </div>
+          <div class="property-wrapper">
+            <label for="fifth-property">Fifth Property</label>
+            <input class="file" type="file" id="fifth-property" name="properties[Fifth Property]">
+          </div>
+        </div>
+        {% endcomment %}
+
+        <div id="backorder" class="hidden">
+          {% capture item %}<span id="selected-variant"></span>{% endcapture %}
+          <p>{{ 'products.product.back_order_message_html' | t: item: item }}</p>
+          <hr>
+        </div>
+
+        {% unless product.available %}
+          {% if settings.notify_me_form %}
+          <div id="sold-out">
+            {% include 'snippet-notify-me' %}
+          </div>
+          {% endif %}
+        {% endunless %}
+
+        <button type="submit" name="add" id="add" class="btn">
+          <span id="addText">ajouter au panier</span>
+        </button>
+        <hr>
+        {% if settings.prod_desc_placement == 'above' or settings.prod_desc_placement == 'bottom' %}
+          {% if settings.social_sharing_products %}
+            {% include 'social-sharing' %}
+          {% endif %}
+        {% endif %}
+
+        {% if settings.prod_desc_placement == 'below' %}
+          {% unless product.description == blank %}
+          <div id="product-description" class="below">
+            <div id="full_description" class="rte" itemprop="description">
+              {{ product.description }}
+            </div>
+          </div>
+          <hr>
+          {% endunless %}
+          {% if settings.social_sharing_products %}
+            <h4>{{ 'products.product.share_title' | t }}</h4>
+            {% include 'social-sharing' %}
+          {% endif %}
+        {% endif %}
+      </div>
+
+    </div>
+
+  {% if product.available %}
+    </form>
+  {% endif %}
+
+  {% if settings.prod_desc_placement == 'bottom' %}
+    {% unless product.description == blank %}
+    <hr>
+    <div id="product-description">
+      <div id="full_description" class="rte" itemprop="description">
+        {{ product.description }}
+      </div>
+    </div>
+    {% endunless %}
+  {% endif %}
+
+</div><!-- #product-content -->
+
+{% include 'snippet-related-products' %}
+<hr>
+{{ 'option_selection.js' | shopify_asset_url | script_tag }}
+<script>
+
+var selectCallback = function(variant, selector) {
+
+  var $add = $('#add'),
+      $addText = $('#addText'),
+      $backorder = $('#backorder'),
+      $price = $('#product-price'),
+      $featuredImage = $('#productPhotoImg');
+
+  if (variant) {
+
+    // Update variant image, if one is set
+    // Call standard.switchImage function in shop.js
+    if (variant.featured_image) {
+      var newImg = variant.featured_image,
+          el = $featuredImage[0];
+      Shopify.Image.switchImage(newImg, el, standard.switchImage);
+    }
+
+    if (variant.available) {
+
+      // Selected a valid variant that is available
+      $addText.html({{ 'products.product.add_to_cart' | t | json }});
+      $add.removeClass('disabled').removeAttr('disabled').fadeTo(200,1);
+
+      // If item is back ordered yet can still be ordered, we'll show special message
+      if (variant.inventory_management && variant.inventory_quantity <= 0) {
+        $('#selected-variant').html({{ product.title | json }}{% unless hide_default_title %} + ' - ' + variant.title{% endunless %});
+        $backorder.removeClass('hidden').fadeTo(200,1);
+      } else {
+        $backorder.fadeTo(200,0).addClass('hidden');
+      }
+
+    } else {
+      // Variant is sold out
+      $backorder.fadeTo(200,0).addClass('hidden');
+      $addText.html({{ 'products.product.sold_out' | t | json }});
+      $add.addClass('disabled').attr('disabled', 'disabled').fadeTo(200,0.5);
+    }
+
+    // Whether the variant is in stock or not, we can update the price and compare at price
+    if ( variant.compare_at_price > variant.price ) {
+      // Update price field
+      $price.html('<span class="product-compare-price">'+Shopify.formatMoney(variant.compare_at_price, "{{ shop.money_format }}")+ '</span><span class="product-price on-sale">'+ Shopify.formatMoney(variant.price, "{{ shop.money_format }}") +'</span>');
+    } else {
+      // Update price field
+      $price.html('<span class="product-price">'+ Shopify.formatMoney(variant.price, "{{ shop.money_format }}") + '</span>' );
+    }
+
+  } else {
+    // variant doesn't exist
+    $backorder.fadeTo(200,0).addClass('hidden');
+    $addText.html({{ 'products.product.unavailable' | t | json }});
+    $add.addClass('disabled').attr('disabled', 'disabled').fadeTo(200,0.5);
+  }
+
+};
+
+$(function() {
+
+  new Shopify.OptionSelectors('product-select', {
+    product: {{ product | json }},
+    onVariantSelected: selectCallback,
+    enableHistoryState: true
+  });
+
+  // Add label if only one product option and it isn't 'Title'
+  {% if product.options.size == 1 and product.options.first != 'Title' %}
+    $('.selector-wrapper:eq(0)').prepend('<label>{{ product.options.first | escape }}</label>');
+  {% endif %}
+  
+  {% if shop.locale == "fr" %}
+  if($('.selector-wrapper:eq(0) label').html() == "Color")
+  {
+    $('.selector-wrapper:eq(0) label').html("Couleur");
+  }
+  
+  if($('.selector-wrapper:eq(1) label').html() == "Size")
+  {
+    $('.selector-wrapper:eq(1) label').html("Taille");
+  }
+  {% endif %}
+
+});
+
+Shopify.Image.preload({{ product.images | json }}, 'grande');
+Shopify.Image.preload({{ product.images | json }}, '1024x1024');
+
+</script>

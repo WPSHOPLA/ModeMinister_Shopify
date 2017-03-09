@@ -1,0 +1,47 @@
+<div class="page-container">
+
+  {% if snippet-collection-listing == '' or template == 'list-collections' %}
+  <h1>{{ 'collections.general.page_title' | t }}</h1>
+  {% else %}
+  <h1>{{ linklists[snippet-collection-listing].title }}</h1>
+  {% endif %}
+
+  {% assign count = 0 %}
+
+  <div id="collection-list" class="grid-uniform product-list">
+    {% if snippet-collection-listing %}
+      {% for link in linklists[snippet-collection-listing].links %}
+        {% if link.type == 'collection_link' %}
+          {% assign collection = link.object %}
+          {% include 'snippet-collection-item' %}
+          {% assign count = count | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {% for collection in collections %}
+        {% unless collection.handle == 'all' or collection.handle == 'all-products' or collection.handle == 'frontpage' %}
+          {% include 'snippet-collection-item' %}
+          {% assign count = count | plus: 1 %}
+        {% endunless %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if count == 0 %}
+    <div id="add-first-collection" class="clearfix">
+      {% if snippet-collection-listing %}
+      <div class="rte">
+        <p>There are no collections in your <strong>{{ linklists[snippet-collection-listing].title }}</strong> link list.</p>
+        <p>Add collections to your <strong>{{ linklists[snippet-collection-listing].title }}</strong> link list by browsing to your <a href="/admin/link_lists">Navigation page</a>{% if template == 'list-collections' %}, or choose a different link list in your <a href="/admin/themes/current/settings">theme settings</a> in the <strong>Collection Pages</strong> section{% endif %}.</p>
+      </div>
+      {% else %}
+      <div class="rte">
+        <p>There are no collections in your store besides your Frontpage collection.</p>
+      </div>
+      <a class="styled-submit clearfix" href="/admin/collections"><span></span>Create a collection</a>
+      {% endif %}
+    </div><!-- #add-first-collection-->
+  {% endif %}
+
+</div><!-- .page-container clearfix -->
+{% include 'snippet-breadcrumbs' %}

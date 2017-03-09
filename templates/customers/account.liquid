@@ -1,0 +1,74 @@
+<div class="page-container">
+  <div class="grid">
+    {% paginate customer.orders by 20 %}
+
+    <div class="grid-item col-4 small--col-12">
+      <div class="group">
+        <h2>{{ 'customer.account.details' | t }}</h2>
+        <h4>{{ customer.name }}</h4>
+        <p class="email note">{{ customer.email }}</p>
+        {% if customer.default_address != nil %}
+          <div class="address note">
+            <p>{{ customer.default_address.address1 }}</p>
+            {% if customer.default_address.address2 != "" %}
+              <p>{{ customer.default_address.address2 }}</p>
+            {% endif %}
+            <p>{{ customer.default_address.city}}, {% if address.province_code %}{{customer.default_address.province_code}}, {% endif %}{{customer.default_address.country}}</p>
+            <p>{{ customer.default_address.zip}}</p>
+            <p>{{ customer.default_address.phone }}</p>
+          </div>
+        {% endif %}
+        <a id="view_address" href="/account/addresses">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a>
+        <div class="change-password-form">
+          {% form 'recover_customer_password' %}
+          <script>
+          if (window.location.hash === '#change-password-form') {
+            document.write('<p class="accent-text">{{ 'customer.recover_password.success' | t }}</p>');
+          }
+          </script>
+          <input type="hidden" name="email" value="{{ customer.email }}">
+          <input type="hidden" name="return_to" value="/account#change-password-form">
+          <input type="submit" class="un-styled-btn" value="{{ 'customer.reset_password.submit' | t }}"> *
+          <p class="rte" style="font-size:80%">(*) {{ 'customer.recover_password.subtext' | t }}</p>
+          {% endform %}
+        </div>
+      </div>
+    </div>
+    <div class="grid-item col-8 small--col-12" id="customer_orders">
+      {% if customer.orders.size != 0 %}
+        <h2 class="">{{ 'customer.orders.title' | t }}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th class="order_number">{{ 'customer.orders.order_number' | t }}</th>
+              <th class="payment_status">{{ 'customer.orders.payment_status' | t }}</th>
+              <th class="fulfillment_status">{{ 'customer.orders.fulfillment_status' | t }}</th>
+              <th class="total">{{ 'customer.orders.total' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in customer.orders %}
+            <tr class="{% if forloop.last %}last{% endif %} {% cycle 'odd', 'even' %} {% if order.cancelled %}cancelled_order{% endif %}">
+              <td class="order_name{% if forloop.first %} first{% endif %}">{{ order.name | link_to: order.customer_url }} - {{ order.created_at | date: format: "short" }}</td>
+              <td class="payment_status{% if forloop.first %} first{% endif %}"><span class="status_{{ order.financial_status }}">{{ order.financial_status_label | capitalize }}</span></td>
+              <td class="fulfillment_status{% if forloop.first %} first{% endif %}"><span class="accent-text fulfillment_color status_{{ order.fulfillment_status }}">{{ order.fulfillment_status_label | capitalize }}</span></td>
+              <td class="total{% if forloop.first %} first{% endif %}"><span class="total money">{{ order.total_price | money }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>{{ 'customer.orders.none' | t }}</p>
+      {% endif %}
+
+      {% if paginate.pages > 1 %}
+        <div class="text-center">
+          {% include 'snippet-pagination' %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% endpaginate %}
+  </div>
+
+</div>

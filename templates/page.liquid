@@ -1,0 +1,21 @@
+<div class="page-container">
+
+  <h1>{{ page.title }}</h1>
+
+  <div class="grid">
+    <div id="page-content" class="grid-item{% if settings.show_page_blog %} col-8 small--col-12{% endif %}">
+      <div class="rte">
+        {{ page.content }}
+      </div>
+    </div><!-- #page-content -->
+
+    {% if settings.show_page_blog %}
+      <div class="grid-item col-4 small--col-12">
+        {% include 'snippet-sidebar' %}
+      </div>
+    {% endif %}
+
+  </div>
+
+</div><!-- #page-container -->
+{% include 'snippet-breadcrumbs' %}

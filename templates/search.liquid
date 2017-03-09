@@ -1,0 +1,91 @@
+{% comment %}
+  Check to enforce respond.js
+{% endcomment %}
+{% assign respond_js_secret_key = shop.domain | md5 %}
+{% unless search.terms == respond_js_secret_key %}
+
+  {% paginate search.results by settings.search_ppp %}
+    <div class="page-container">
+
+      <h1>{{ 'general.search.title' | t }}</h1>
+
+      <div id="search-content" class="grid">
+        <div class="grid-item col-12">
+          {% if search.performed %}
+
+            {% if search.results.size > 0 %}
+              <p class="accent-text" id="searching-for">{{ 'general.search.results_for_html' | t: terms: search.terms }}</p>
+
+              <ol>
+                {% for item in search.results %}
+                <li class="media search-result {% if forloop.first %}first{% endif %} {% if forloop.last %}last{% endif %} clearfix">
+                  {% if item.featured_image or item.image %}
+                  {% assign image_alt = item.title | escape %}
+                  <a class="media-img search-result-image" href="{{ item.url }}" title="{{ item.title | escape }}">
+                    <img{% if item.available == false %} class="sold-out"{% endif %} src="{{ item | img_url: 'large' }}" alt="{{ image_alt }}">
+                  </a>
+                  {% endif %}
+
+                  <div class="media-flex">
+                    <h2 class="search-result-title">{{ item.title | link_to: item.url }}{% if item.available == false %} <span class="accent-text">{{ 'products.product.sold_out' | t }}</span>{% endif %}</h2>
+                    {% if item.object_type == 'product' %}
+                      {% assign product = item %}
+                      {% if product.compare_at_price > product.price %}
+                      <p class="on-sale accent-text search-result-price">
+                        {{ product.price | money }}
+                        <em class="compare-at-price">{{ product.compare_at_price | money }}</em>
+                      </p>
+                      {% else %}
+                      <p class="accent-text search-result-price">
+                        {% if product.price_varies %}From{% endif %}
+                        {{ product.price | money }}
+                      </p>
+                      {% endif %}
+                    {% endif %}
+                    <p class="search-result-description">{% if item.featured_image %}{{ item.description | strip_html | truncatewords: 55 | highlight: search.terms }}{% else %}{{ item.content | strip_html | truncatewords: 55 | highlight: search.terms }}{% endif %}</p>
+                  </div><!-- .result-details -->
+                </li>
+                {% endfor %}
+
+                <li class="search-pagination">
+                  {% include 'snippet-pagination' %}
+                </li>
+              </ol>
+            {% else %}
+              <p id="searching-for" class="accent-text">{{ 'general.search.no_results_html' | t: terms: search.terms }}"</p>
+            {% endif %}
+
+          {% endif %}
+
+          {% unless search.performed and search.results.size > 0 %}
+            <form action="/search" method="get">
+              <p>{% if settings.search_products_only %}
+                <input type="hidden" name="type" value="product">{% endif %}
+                <input name="q" type="text" class="styled-input" placeholder="{{ 'general.search.placeholder' | t }}">
+                <input type="submit" value="{{ 'general.search.submit' | t }}" name="submit" class="btn styled-submit">
+              </p>
+            </form>
+          {% endunless %}
+        </div>
+
+      </div><!-- #search-content -->
+
+    </div><!-- .page-container -->
+  {% endpaginate %}
+
+  {% if search.results_count == 0 and settings.extra_featured_products and settings.extra_featured_products != '' and collections[settings.extra_featured_products].handle == settings.extra_featured_products and collections[settings.extra_featured_products].products_count > 0 %}
+  <div class="featured-collection">
+    <div id="coll-product-list" class="grid-uniform product-list">
+      {% for product in collections[settings.extra_featured_products].products %}
+        {% include 'snippet-product-item' %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% include 'snippet-breadcrumbs' %}
+
+{% else %}
+  {% include 'respond' %}
+  {% layout none %}
+{% endunless %}

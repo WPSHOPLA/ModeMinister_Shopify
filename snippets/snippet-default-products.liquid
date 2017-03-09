@@ -1,0 +1,41 @@
+{% if settings.products_per_row == "3" or settings.products_per_row == 3 %}
+  {% assign grid_item_width = 'large--col-4 medium-down--col-6' %}
+{% endif %}
+
+{% if full_width %}
+  {% assign grid_item_width = 'large--col-3 medium-down--col-6' %}
+{% else %}
+  {% assign grid_item_width = 'large--col-6 medium-down--col-6' %}
+{% endif %}
+
+{% if template == 'index' %}
+  <div id="fp-product-list" class="grid-uniform default">
+{% endif %}
+{% if template contains 'collection' %}
+  <div id="coll-product-list" class="grid-uniform default">
+{% endif %}
+
+    {% for i in (1..settings.products_per_row) %}
+      <div class="grid-item {{ grid_item_width }} default">
+        <div class="coll">
+          <div class="coll-image-wrap">
+            <p>{{ 'products.default.example' | t }}</p>
+          </div><!-- .coll-image-wrap -->
+          <div class="coll-prod-caption">
+            <a class="coll-prod-buy styled-small-button" href="/">{{ 'collections.product_item.buy_text' | t }}</a>
+            <div class="coll-prod-meta {% if settings.show_buy_medallion == false %}no-medallion{% endif %}">
+              <h5>{{ 'products.default.your_product' | t }}</h5>
+              <p class="coll-prod-price accent-text">$0.00</p>
+            </div><!-- .coll-prod-meta -->
+          </div><!-- .coll-prod-caption -->
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+{% if template == 'index' %}
+  <div id="add-first-product">
+    <a class="styled-submit clearfix" href="/admin/products/new"><span></span>{{ 'products.default.add_product' | t }}</a>
+  </div>
+{% endif %}

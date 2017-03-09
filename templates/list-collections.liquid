@@ -1,0 +1,5 @@
+{% if settings.ll_collections != '' and linklists[settings.ll_collections].links.size > 0 %}
+  {% include 'snippet-collection-listing' with settings.ll_collections %}
+{% else %}
+  {% include 'snippet-collection-listing' %}
+{% endif %}

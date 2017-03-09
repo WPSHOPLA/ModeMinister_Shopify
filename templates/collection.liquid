@@ -1,0 +1,115 @@
+{% paginate collection.products by settings.collection_ppp %}
+
+<div class="grid">
+  <div class="grid-item col-5 medium-down--col-12">
+    <h1>{{ collection.title }}</h1>
+  </div>
+
+  <div class="grid-item col-7 medium-down--col-12 large--text-right">
+    {% if settings.show_bbt and collection.all_tags.size > 0 %}
+    <div class="filter">
+      <p>{{ 'collections.sorting.tag_title' | t }}</p>
+      <select class="coll-filter" name="coll-filter" size="1">
+        <option value="">{{ 'collections.sorting.all' | t }}</option>
+        {% for tag in collection.all_tags %}
+        {% if current_tags contains tag %}
+        <option value="{{ tag | handleize }}" selected>{{ tag }}</option>
+        {% else %}
+        <option value="{{ tag | handleize }}">{{ tag }}</option>
+        {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    {% if settings.show_sb and collection.products_count > 1 %}
+    <div class="filter">
+      <p>{{ 'collections.sorting.sort_title' | t }}</p>
+      <select class="sort-by">
+        <option value="manual">{{ 'collections.sorting.featured' | t }}</option>
+        <option value="price-ascending">{{ 'collections.sorting.price_ascending' | t }}</option>
+        <option value="price-descending">{{ 'collections.sorting.price_descending' | t }}</option>
+        <option value="title-ascending">{{ 'collections.sorting.az' | t }}</option>
+        <option value="title-descending">{{ 'collections.sorting.za' | t }}</option>
+        <option value="created-ascending">{{ 'collections.sorting.date_ascending' | t }}</option>
+        <option value="created-descending">{{ 'collections.sorting.date_descending' | t }}</option>
+        <option value="best-selling">{{ 'collections.sorting.best_selling' | t }}</option>
+      </select>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% if collection.description.size > 0 %}
+<div id="collection-description" class="rte">
+  {{ collection.description }}
+</div><!-- .collection-description rte -->
+{% endif %}
+
+{% if shop.products_count == 0 %}
+
+  {% include 'snippet-default-products' %}
+
+{% else %}
+
+  <div id="coll-product-list" class="grid-uniform product-list">
+    {% for product in collection.products %}
+      {% assign grid_item_width = 'large--col-4 medium--col-4 small--col-6' %}
+      {% include 'snippet-product-item' %}
+    {% endfor %}
+  </div>
+
+{% endif %}
+
+{% include 'snippet-pagination' %}
+{% include 'snippet-breadcrumbs' %}
+
+{% endpaginate %}
+
+<script>
+  Shopify.queryParams = {};
+  if (location.search.length) {
+    for (var aKeyValue, i = 0, aCouples = location.search.substr(1).split('&'); i < aCouples.length; i++) {
+      aKeyValue = aCouples[i].split('=');
+      if (aKeyValue.length > 1) {
+        Shopify.queryParams[decodeURIComponent(aKeyValue[0])] = decodeURIComponent(aKeyValue[1]);
+      }
+    }
+  }
+  var collFilters = jQuery('.coll-filter');
+  collFilters.change(function() {
+      var newTags = [];
+      var newURL = '';
+      delete Shopify.queryParams.page;
+      collFilters.each(function() {
+        if (jQuery(this).val()) {
+          newTags.push(jQuery(this).val());
+        }
+      });
+      {% if collection.handle %}
+      newURL = '/collections/' + '{{ collection.handle }}';
+      if (newTags.length) {
+        newURL += '/' + newTags.join('+');
+      }
+      var search = jQuery.param(Shopify.queryParams);
+      if (search.length) {
+        newURL += '?' + search;
+      }
+      location.href = newURL;
+      {% else %}
+      if (newTags.length) {
+        Shopify.queryParams.constraint = newTags.join('+');
+      }
+      else {
+        delete Shopify.queryParams.constraint;
+      }
+      location.search = jQuery.param(Shopify.queryParams).replace(/\+/g, '%20');
+      {% endif %}
+  });
+  jQuery('.sort-by')
+    .val('{{ collection.sort_by | default: collection.default_sort_by  }}')
+    .on('change', function() {
+      Shopify.queryParams.sort_by = jQuery(this).val();
+      location.search = jQuery.param(Shopify.queryParams).replace(/\+/g, '%20');
+    });
+</script>

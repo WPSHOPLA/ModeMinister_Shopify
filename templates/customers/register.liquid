@@ -1,0 +1,43 @@
+<div id="customer-accounts" class="content customer">
+
+  <!-- Create Customer -->
+  <div id="create-customer">
+    <div class="page-header">
+      <h1>{{ 'customer.register.title' | t }}</h1>
+    </div>
+
+    <p class="note accent-text text-center">{{ 'customer.register.subtext' | t: shop_name: shop.name }}</p>
+
+    <div class="boxed-form">
+      {% form 'create_customer' %}
+
+        {{ form.errors | default_errors }}
+
+        <div id="first_name" class="clearfix form-row">
+          <label for="first_name" class="login">{{ 'customer.register.first_name' | t }}</label>
+          <input type="text" name="customer[first_name]" id="first_name" class="styled-input" placeholder="{{ 'customer.register.first_name' | t }}" value="{{ form.first_name }}" size="30">
+        </div>
+
+        <div id="last_name" class="clearfix form-row">
+          <label for="last_name" class="login">{{ 'customer.register.last_name' | t }}</label>
+          <input type="text" name="customer[last_name]" id="last_name" class="styled-input" placeholder="{{ 'customer.register.last_name' | t }}" value="{{ form.last_name }}" size="30">
+        </div>
+
+        <div id="email" class="clearfix form-row">
+          <label for="email" class="login">{{ 'customer.register.email' | t }}</label>
+          <input type="email" name="customer[email]" id="email" class="styled-input{% if form.errors contains 'email' %} error{% endif %}" placeholder="{{ 'customer.register.email' | t }}" value="{{ form.email }}" size="30">
+        </div>
+
+        <div id="password" class="clearfix form-row">
+          <label for="password" class="login">{{ 'customer.register.password' | t }}</label>
+          <input type="password" name="customer[password]" id="password" class="password styled-input{% if form.errors contains 'password' %} error{% endif %}" value="{{ form.password }}" size="30">
+        </div>
+
+        <div class="action-bottom clearfix">
+          <input class="btn styled-submit" type="submit" value="{{ 'customer.register.submit' | t }}">
+        </div>
+      {% endform %}
+    </div>
+  </div><!-- /#create-customer -->
+
+</div><!-- #customer-accounts -->

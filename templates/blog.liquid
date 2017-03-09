@@ -1,0 +1,75 @@
+{% paginate blog.articles by settings.blog_app %}
+<div class="clearfix page-container">
+
+    {% if current_tags %}
+      <h1>{{ blog.title | link_to: blog.url }} / {{ current_tags.first }}</h1>
+    {% else %}
+      <h1>{{ blog.title }}</h1>
+    {% endif %}
+
+  <div class="grid">
+    <div id="blog-content" class="grid-item{% if settings.show_page_blog %} col-8 small--col-12{% endif %}">
+      {% for article in blog.articles %}
+        <div class="blog-article{% if forloop.last %} last{% endif %}">
+          <h2>
+            <a href="{{ article.url }}">{{ article.title }}</a>
+          </h2>
+          <p class="blog-article-date accent-text">
+            <time pubdate datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+              {{ article.published_at | date: format: 'month_day_year' }}
+            </time>
+          </p>
+          <div class="rte">
+            {% if article.image %}
+              {% assign image_alt = article.title | escape %}
+              <p>{{ article | img_url: '1024x1024' | img_tag: image_alt, 'blog-article-image' | link_to: article.url  }}</p>
+            {% endif %}
+            {% if article.excerpt == blank %}
+              {{ article.content }}
+            {% else %}
+              {{ article.excerpt }}
+            {% endif %}
+          </div><!-- .rte -->
+          <a class="blog-read-more accent-text" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }} →</a>
+          <div class="blog-article-meta accent-text">
+
+            {% if blog.comments_enabled? %}
+              <div class="blog-article-meta-item">
+                  <span class="icon-fallback-text">
+                    <span class="icon icon-comment" aria-hidden="true"></span>
+                  </span>
+                  <a href="{{ article.url }}#comments" class="blog-article-comments">{{ 'blogs.comments.with_count' | t: count: article.comments_count }}</a>
+              </div>
+            {% endif %}
+
+            {% if article.tags.size > 0 %}
+              <div class="blog-article-meta-item">
+                <span class="icon-fallback-text">
+                  <span class="icon icon-tag" aria-hidden="true"></span>
+                  <span class="fallback-text">{{ 'blogs.article.tags' | t }}:</span>
+                </span>
+                {% for tag in article.tags %}
+                <a href="{{ blog.url }}/tagged/{{ tag | handle }}">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+          </div>
+        </div>
+        <hr>
+      {% endfor %}
+      <div class="blog-pagination">
+        {% include 'snippet-pagination' %}
+      </div>
+      {% endpaginate %}
+    </div><!-- #blog-content -->
+    {% if settings.show_page_blog %}
+      <div class="grid-item col-4 small--col-12">
+        {% include 'snippet-sidebar' %}
+      </div>
+    {% endif %}
+  </div>
+
+</div><!-- #page-container -->
+
+{% include 'snippet-breadcrumbs' %}

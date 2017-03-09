@@ -1,0 +1,33 @@
+{% form 'contact' %}
+  {% if form.posted_successfully? %}
+  <p class="accent-text">{{ 'products.notify.thanks_text' | t }}</p>
+  {% else %}
+  <p><a id="notify-me" href="#">{{ 'products.notify.click_to_notify' | t }}</a></p>
+  {% endif %}
+  {% if form.errors %}
+  <div class="error feedback accent-text">
+    <p>{{ 'products.notify.valid_email' | t }}</p>
+  </div>
+  {% endif %}
+  {% unless form.posted_successfully? %}
+  <div id="notify-me-wrapper" class="clearfix" style="display:none; margin:10px 0;">
+    {% if customer %}
+    <input type="hidden" name="contact[email]" value="{{ customer.email }}">
+    {% else %}
+    <input style="float:left; width:200px;" required="required" type="email" name="contact[email]" placeholder="{{ 'products.notify.placeholder_email' | t }}" class="styled-input{% if form.errors contains 'email' %} error{% endif %}" value="{{ contact.fields.email }}">
+    {% endif %}
+    <input type="hidden" name="contact[body]" value="Please notify me when {{ product.title | remove: '"' }} becomes available.">
+    <input style="float:left; margin-left:5px;" class="btn styled-submit" type="submit" value="{{ 'products.notify.submit' | t }}">
+  </div>
+  {% endunless %}
+  <script>
+  jQuery('#notify-me').click(function() {
+    {% if customer %}
+    jQuery('#sold-out form').submit();
+    {% else %}
+    jQuery('#notify-me-wrapper').fadeIn();
+    {% endif %}
+    return false;
+  } );
+  </script>
+{% endform %}

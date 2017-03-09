@@ -1,0 +1,159 @@
+<div class="clearfix page-container">
+
+  {% if cart.item_count > 0 %}
+
+  <h1>{{ 'cart.general.title' | t }}</h1>
+
+  <form action="/cart" method="post" novalidate>
+
+    {% for item in cart.items %}
+      {% assign coll_handle = item.product.collections.last.handle %}
+      {% if coll_handle == 'frontpage' or coll_handle == '' %}
+        {% assign coll_handle = 'all' %}
+      {% endif %}
+      {% if forloop.first %}
+        {% assign continue_shopping_handle = coll_handle %}
+      {% endif %}
+
+      <div class="cart-row" data-id="{{ item.id }}">
+        <div class="grid">
+          <div class="grid-item col-7 medium-down--col-12">
+            <div class="grid cart-detail">
+              <div class="grid-item col-4">
+                <a href="{{ item.url }}">
+                  <img src="{{ item | img_url: 'medium' }}" alt="{{ item.title | escape }}">
+                </a>
+              </div>
+              <div class="grid-item col-8">
+                <h4 class="cart-product-title"><a href="{{ item.url }}">{{ item.title }}</a></h4>
+
+                {% assign property_size = item.properties | size %}
+                {% if property_size > 0 %}
+                  {% for p in item.properties %}
+                    {% assign first_character_in_key = p.first | truncate: 1, '' %}
+                    {% unless p.last == blank or first_character_in_key == '_' %}
+                      {{ p.first }}:
+                      {% if p.last contains '/uploads/' %}
+                        <a class="lightbox" href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                      {% else %}
+                        {{ p.last }}
+                      {% endif %}
+                      <br>
+                    {% endunless %}
+                  {% endfor %}
+                {% endif %}
+
+                {% if settings.show_vendor %}
+                  <h6>{{ item.vendor }}</h6>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-item medium-down--col-4 small--hide"></div>
+          <div class="grid-item col-5 medium--col-8 small--col-12">
+            <div class="display-table">
+              <div class="display-table-cell col-2 small--col-3">
+                <span class="nowrap">{{ item.price | money }}</span> <small>({{ 'cart.general.each' | t }})</small>
+              </div>
+              <div class="display-table-cell col-2 small--col-3">
+                <input type="number" name="updates[]" id="updates_{{ item.id }}" value="{{ item.quantity }}" min="0">
+              </div>
+              <div class="display-table-cell col-6 small--col-6">
+
+              {% if item.original_line_price != item.line_price %}
+                <small class="cart-item__original-price"><s>{{ item.original_line_price | money }}</s></small>
+                <br>
+              {% endif %}  
+
+                <strong class="nowrap">{{ item.line_price | money }}</strong>
+               
+                {% for discount in item.discounts %}
+                  <br>
+                  <small class="cart-item__discount">{{ discount.title }}</small>
+                {% endfor %}
+
+              </div>
+              <div class="display-table-cell text-right">
+                <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="icon-fallback-text btn-secondary">
+                  <span class="icon icon-x" aria-hidden="true"></span>
+                  <span class="fallback-text">{{ 'cart.general.remove' | t }}</span>
+                </a>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="grid">
+      {% if settings.show_cart_notes %}
+        <div id="cart-notes" class="grid-item col-5 small--col-12">
+          <p>{{ 'cart.general.note' | t }}</p>
+          <textarea class="styled-input" id="cart-notes-area" name="note">{{ cart.note }}</textarea>
+        </div><!-- #cart-notes -->
+      {% endif %}
+      <div id="cart-meta" class="grid-item text-right{% if settings.show_cart_notes %} col-7{% else %} col--12{% endif %} small--col-12">
+
+        <h3 id="cart-subtotal">{{ 'cart.general.subtotal' | t }} <em>{{ cart.total_price | money }}</em></h3>
+
+        {% if cart.total_discounts > 0 %}
+        {% assign savings = cart.total_discounts | money %}
+        <h3 id="cart-subtotal">
+          <div class="cart-additional-savings">{{ 'cart.general.savings_html' | t: price: savings }}</div>
+        </h3>
+        {% endif %}
+
+        <h3 id="estimated-shipping" style="display:none">+ {{ 'cart.general.estimated_shipping' | t }} <em>{{ 0 | money }}</em></h3>
+        <p class="cart-subtotal__note"><em>{{ 'cart.general.taxes_extra' | t }}</em></p>
+        <input type="submit" id="update-cart" name="update" value="{{ 'cart.general.update' | t }}"> <span class="or">{{ 'cart.general.or' | t }}</span> <input id="checkout-button" class="styled-submit" type="submit" name="checkout" value="{{ 'cart.general.checkout' | t }}">
+        {% if additional_checkout_buttons %}
+          <div class="additional-checkout-buttons">
+            {{ content_for_additional_checkout_buttons }}
+          </div>
+        {% endif %}
+        
+      </div><!-- #cart-meta -->
+
+    </div>
+    <p class="cart-disclaimer">
+      {{ shop.name }} process all orders in {{ shop.currency }}.
+      While the content of your cart is currently displayed in
+      <span class="selected-currency"></span>,
+      you will check out using {{ shop.currency }} at the most current exchange rate.
+    </p>
+  </form>
+
+  {% else %}
+
+  <div class="text-center">
+    <h2>{{ 'cart.general.title' | t }}</h2>
+    <p>{{ 'cart.general.empty' | t }}</p>
+    <p>{{ 'cart.general.continue_browsing_html' | t }}</p>
+  </div>
+
+  {% unless settings.extra_featured_products == blank or collections[settings.extra_featured_products].empty? %}
+  <div class="featured-collection">
+    <div id="coll-product-list" class="grid-uniform product-list">
+      {% for product in collections[settings.extra_featured_products].products %}
+        {% include 'snippet-product-item' %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endunless %}
+
+  {% endif %} <!-- if cart.item_count > 0  -->
+
+</div><!-- .clearfix page-container -->
+
+{% unless cart.item_count == 0 %}
+
+{% include 'snippet-shipping-rates-calculator' %}
+
+<div id="breadcrumbs" class="accent-text">
+  {{ 'cart.general.continue_browsing_html' | t }}
+</div>
+{% endunless %}
